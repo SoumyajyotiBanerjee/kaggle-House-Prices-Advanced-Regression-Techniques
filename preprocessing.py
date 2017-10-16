@@ -53,13 +53,10 @@ c=0
 #Need special care -1 | Replace by Mean as continues - 0 | need no care - 2
 for e in list_null:
     if (e and type_col[c]==1):
-        print "HERE IN CAT"
         need_care.append((ls[c],1))
     if e and type_col[c]==0:
-        print "HERE IN CONT"
         need_care.append((ls[c],0))
     if not e:
-        print "HERE IN LAST"
         need_care.append((ls[c],2))
     print c,type_col[c],ls[c], e
     c+=1

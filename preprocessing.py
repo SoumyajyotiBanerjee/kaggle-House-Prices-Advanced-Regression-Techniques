@@ -36,7 +36,7 @@ for e in ls:
         type_col.append(1)
         
 
-print type_col
+#print type_col
 
 
 
@@ -58,11 +58,38 @@ for e in list_null:
         need_care.append((ls[c],0))
     if not e:
         need_care.append((ls[c],2))
-    print c,type_col[c],ls[c], e
+    #print c,type_col[c],ls[c], e
     c+=1
    
 Y = df2['SalePrice']
 #print need_care
+
+df3=df2[df2.BsmtQual.isnull()]
+dfs_dictionary = {'DF1':df2,'DF2':df3}
+df5 = df4.drop_duplicates(keep=False)
+
+df5.shape
+
+need_care2 = []
+c=0
+list_null = df5.isnull().any()
+
+for e in list_null:
+    if (e and type_col[c]==1):
+        need_care2.append((ls[c],1))
+    if e and type_col[c]==0:
+        need_care2.append((ls[c],0))
+    if not e:
+        need_care2.append((ls[c],2))
+    #print c,type_col[c],ls[c], e
+    c+=1
+    
+temp = [x for x in need_care2 if x[1]==1]
+
+print temp
+
+
+
 #print Y.shape
 
 

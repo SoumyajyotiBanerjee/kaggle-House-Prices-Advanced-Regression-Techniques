@@ -8,8 +8,9 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-
-
+from sklearn.preprocessing import LabelEncoder
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error, r2_score
 os.chdir("E:\kaggle")
 
 print "Hello"
@@ -30,12 +31,13 @@ count = 0
 c=0
 #1 - categorical - 0 for continues variable
 type_col = []
-
+catgorical_features = []
 for e in ls:
     if df2[e].value_counts().shape[0]>20:
         type_col.append(0)
     else:
         type_col.append(1)
+        catgorical_features.append(e)
         
 
 #print type_col
@@ -120,7 +122,7 @@ df2['GarageYrBlt'].fillna(df2['GarageYrBlt'].median(), inplace=True)
 
 print  sum([True for idx,row in df2.iterrows() if any(row.isnull())])
 print df2.shape
-
+list_null = df2.isnull().any()
 p=[]
 c=0
 for e in list_null:
@@ -135,3 +137,29 @@ for e in list_null:
     c+=1
 
 print p
+
+df3 = df2.dropna()
+print df3.shape
+print catgorical_features
+
+Y = df3['SalePrice']
+train = df3.drop('SalePrice',1)
+print train.shape
+le = LabelEncoder()
+for e in catgorical_features:
+    try:
+        train[e] = le.fit_transform(train[e])
+    except:
+        print('Error encoding '+e)
+        
+train = train.drop('Neighborhood',1)
+
+#print train.columns.values
+
+train = train.drop('Id',1)
+
+#print train
+train = train.convert_objects(convert_numeric=True)
+regr = linear_model.LinearRegression()
+regr.fit(train, Y)
+

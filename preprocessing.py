@@ -163,16 +163,17 @@ train = train.drop('Id',1)
 
 print "----",train.shape
 #print train
-'''
+
 train = train.convert_objects(convert_numeric=True)
 regr = linear_model.LinearRegression()
+
 regr.fit(train, Y)
 
-'''
 
-lsvc = LinearSVC(C=0.01, penalty="l1", dual=False).fit(train, Y)
 
-model = SelectFromModel(lsvc, prefit=True)
+#lsvc = LinearSVC(C=0.01, penalty="l1", dual=False).fit(train, Y)
+
+model = SelectFromModel(regr, prefit=True)
 X_new = model.transform(train)
 
 print X_new.shape

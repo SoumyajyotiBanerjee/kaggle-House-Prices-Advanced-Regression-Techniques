@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.svm import LinearSVC
+from sklearn.feature_selection import SelectFromModel
+
 os.chdir("E:\kaggle")
 
 print "Hello"
@@ -158,8 +161,26 @@ train = train.drop('Neighborhood',1)
 
 train = train.drop('Id',1)
 
+print "----",train.shape
 #print train
+'''
 train = train.convert_objects(convert_numeric=True)
 regr = linear_model.LinearRegression()
 regr.fit(train, Y)
+
+'''
+
+lsvc = LinearSVC(C=0.01, penalty="l1", dual=False).fit(train, Y)
+
+model = SelectFromModel(lsvc, prefit=True)
+X_new = model.transform(train)
+
+print X_new.shape
+
+
+train = train.convert_objects(convert_numeric=True)
+regr = linear_model.LinearRegression()
+model = regr.fit(X_new, Y)
+
+print "END"
 

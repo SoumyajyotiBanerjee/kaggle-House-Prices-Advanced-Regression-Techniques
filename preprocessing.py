@@ -11,8 +11,11 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.svm import LinearSVC
 from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+
 
 os.chdir("E:\kaggle")
 
@@ -32,6 +35,8 @@ ls = df2.columns.values
 
 count = 0
 c=0
+
+cat_var = []
 #1 - categorical - 0 for continues variable
 type_col = []
 catgorical_features = []
@@ -157,6 +162,7 @@ for e in catgorical_features:
         
 train = train.drop('Neighborhood',1)
 
+
 #print train.columns.values
 
 train = train.drop('Id',1)
@@ -166,7 +172,7 @@ print "----",train.shape
 
 train = train.convert_objects(convert_numeric=True)
 regr = linear_model.LinearRegression()
-
+train_2=train
 regr.fit(train, Y)
 
 
@@ -176,12 +182,52 @@ regr.fit(train, Y)
 model = SelectFromModel(regr, prefit=True)
 X_new = model.transform(train)
 
+
+
 print X_new.shape
 
+index = ['Row'+str(i) for i in range(1, len(X_new)+1)]
+X_new_df = pd.DataFrame(X_new, index=index)
+train = X_new_df.convert_objects(convert_numeric=True)
+c=0
+list_col_new = X_new_df.columns.values
+list_col_old = train_2.columns.values
+list_already_taken = []
+p=0
+for e in list_col_new:
+    k = X_new_df[e].iloc[0]
+    c=1
+    print k
+    for ki in list_col_old:
+        if train_2[ki].iloc[0]==k and ki not in list_already_taken:
+            list_already_taken.append(ki)
+            if type_col[c]==1:
+                print "Catagorical var %s selected \n "%ki
+                p+=1
+            break
+        c+=1
+                
+print "attributes cat--",p
+print list_already_taken
 
-train = train.convert_objects(convert_numeric=True)
+
+
+X_train, X_test, y_train, y_test = train_test_split(X_new_df, Y, test_size=0.3, random_state=0)
+
+print X_train.shape
+print X_test.shape
+print y_train.shape
+print y_test.shape
+
+
 regr = linear_model.LinearRegression()
-model = regr.fit(X_new, Y)
+model = regr.fit(X_train, y_train)
+
+Y_res = model.predict(X_test)
+
+print("Mean squared error: %.2f"% mean_squared_error(y_test, Y_res))
+print('Variance score: %.2f' % r2_score(y_test, Y_res))
+
 
 print "END"
 
